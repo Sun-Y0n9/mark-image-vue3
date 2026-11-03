@@ -1,0 +1,59 @@
+{
+  "name": "@mark-image/vue3",
+  "version": "0.1.0",
+  "description": "Vue 3 image annotation canvas: pen, rect, circle, zoom, pan and rotate.",
+  "type": "module",
+  "main": "./dist/mark-image.cjs",
+  "module": "./dist/mark-image.js",
+  "unpkg": "./dist/mark-image.umd.js",
+  "exports": {
+    ".": {
+      "import": "./dist/mark-image.js",
+      "require": "./dist/mark-image.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "annotation",
+    "image",
+    "fabric",
+    "canvas",
+    "mark-image"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "fabric": "^4.5.0",
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.4",
+    "@commitlint/config-conventional": "^21.2.4",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "fabric": "^4.6.0",
+    "less": "^4.3.0",
+    "vite": "^6.3.5",
+    "vite-plugin-css-injected-by-js": "^3.5.2",
+    "vue": "^3.5.13"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

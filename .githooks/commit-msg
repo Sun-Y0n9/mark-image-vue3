@@ -1,0 +1,27 @@
+#!/bin/sh
+# Strip Co-authored-by trailers, then enforce Conventional Commits.
+msg_file="$1"
+tmp="${msg_file}.strip"
+awk '
+  {
+    lines[NR] = $0
+  }
+  END {
+    n = NR
+    while (n > 0 && lines[n] ~ /^[[:space:]]*$/) n--
+    while (n > 0 && lines[n] ~ /^Co-authored-by:/) {
+      n--
+      while (n > 0 && lines[n] ~ /^[[:space:]]*$/) n--
+    }
+    for (i = 1; i <= n; i++) print lines[i]
+  }
+' "$msg_file" > "$tmp"
+mv "$tmp" "$msg_file"
+
+root=$(CDPATH= cd -- "$(dirname "$0")/.." && pwd)
+cli="$root/node_modules/@commitlint/cli/cli.js"
+if [ ! -f "$cli" ]; then
+  echo "commitlint is not installed. Run npm install in this repository." >&2
+  exit 1
+fi
+node "$cli" --edit "$msg_file"
