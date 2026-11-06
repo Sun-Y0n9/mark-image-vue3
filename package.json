@@ -34,7 +34,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "git+https://github.com/Sun-Y0n9/mark-image-vue3.git"
   },
   "publishConfig": {
     "access": "public"
