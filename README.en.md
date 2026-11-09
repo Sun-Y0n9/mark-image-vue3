@@ -6,6 +6,8 @@ Vue 3 image annotation component. It matches the behavior of the Vue 2 package `
 
 Dependencies: `vue@3`, `fabric@4`.
 
+Live demo: https://sun-y0n9.github.io/mark-image-vue3/
+
 ## Features
 
 - Pen, rectangle, and circle (each can be enabled as needed)
