@@ -219,7 +219,8 @@ defineOptions({
 
 const props = defineProps({
   imageUrl: { type: String, required: true },
-  storageKey: { type: String, required: true },
+  /** 画布标识。同一页多个实例需互不相同，并写入默认导出文件名 */
+  canvasId: { type: String, required: true },
   initialAnnotateList: { type: Array, default: () => [] },
   /** 已提交标注（Fabric objects 结构，用于编辑回显） */
   initialStoredPayload: { type: Object, default: null },
@@ -988,6 +989,36 @@ function getAnnotationJson () {
   return getAnnotationPayload()
 }
 
+function annotationObjectsFrom (payload) {
+  let data = payload
+  if (typeof data === 'string') {
+    try {
+      data = JSON.parse(data)
+    } catch (error) {
+      return null
+    }
+  }
+  if (Array.isArray(data)) return data
+  if (data && Array.isArray(data.objects)) return data.objects
+  return null
+}
+
+/** 把 getAnnotationJson() 的结果画到当前图片上。图片尚未就绪时返回 false。 */
+function loadAnnotationJson (payload) {
+  if (!canvas) return false
+  const objects = annotationObjectsFrom(payload)
+  if (!objects) return false
+  if (!objects.length) {
+    canvas.getObjects().slice().forEach(object => canvas.remove(object))
+    canvas.renderAll()
+    captureBaseline()
+    syncUnsavedState()
+    return true
+  }
+  loadFabricObjects(objects)
+  return true
+}
+
 function getAnnotatedImageDataURL (options = {}) {
   if (!canvas) return ''
   const format = options.type || props.imageType || 'png'
@@ -1008,7 +1039,7 @@ function getAnnotatedImageBlob (options = {}) {
 function getAnnotatedImageFile (filename, options = {}) {
   const blob = getAnnotatedImageBlob(options)
   const ext = (options.type || props.imageType) === 'jpeg' ? 'jpg' : 'png'
-  const name = filename || `annotation-${props.storageKey || 'image'}.${ext}`
+  const name = filename || `annotation-${props.canvasId || 'image'}.${ext}`
   return blobToFile(blob, name)
 }
 
@@ -1029,7 +1060,7 @@ async function getAnnotatedImage (options = {}) {
   const blob = dataURLToBlob(dataURL)
   const file = blobToFile(
     blob,
-    options.filename || `annotation-${props.storageKey || 'image'}.${(options.type || props.imageType) === 'jpeg' ? 'jpg' : 'png'}`
+    options.filename || `annotation-${props.canvasId || 'image'}.${(options.type || props.imageType) === 'jpeg' ? 'jpg' : 'png'}`
   )
   return {
     mode: 'image',
@@ -1201,6 +1232,7 @@ onBeforeUnmount(() => {
 
 defineExpose({
   getAnnotationJson,
+  loadAnnotationJson,
   getAnnotationPayload,
   getAnnotatedImageFile,
   getAnnotatedImageBlob,

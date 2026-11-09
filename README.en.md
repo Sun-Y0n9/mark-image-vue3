@@ -41,7 +41,7 @@ app.mount('#app')
   <annotation-canvas
     ref="canvas"
     :image-url="imageUrl"
-    storage-key="page-1"
+    canvas-id="page-1"
     @save="onSave"
   />
 </template>
@@ -80,7 +80,7 @@ export default {
 <annotation-canvas
   ref="canvas"
   :image-url="imageUrl"
-  storage-key="page-1"
+  canvas-id="page-1"
   save-mode="json"
   :colors="['#ef4444', '#3b82f6']"
   :line-widths="[{ value: 2, label: 'Thin' }, { value: 5, label: 'Thick' }]"
@@ -114,19 +114,21 @@ When `saveMode` is `image`, it returns `{ mode: 'image', file, blob, dataURL, js
 ```vue
 <annotation-canvas
   :image-url="imageUrl"
-  storage-key="page-1"
+  canvas-id="page-1"
   :initial-stored-payload="savedJson"
 />
 ```
 
 `savedJson` has the same shape as `getAnnotationJson()`: `{ objects: [ /* fabric objects */ ] }`.
 
+After the image is open, call `loadAnnotationJson(savedJson)` to draw those marks on the current image. The argument can also be an `objects` array or a JSON string.
+
 ## Props
 
 | Prop | Type | Default | Description |
 | --- | --- | --- | --- |
 | imageUrl | String | required | Image URL |
-| storageKey | String | required | Canvas id. Must be unique when several instances are on the same page |
+| canvasId | String | required | Canvas id. Must be unique per page, and is used in the default export filename, such as `annotation-page-1.png` |
 | saveMode | String | `'json'` | `json`: save annotation data. `image`: export a new image with annotations composited on the original |
 | imageType | String | `'png'` | Export format, `png` or `jpeg` |
 | imageQuality | Number | `0.92` | `jpeg` quality, from `0` to `1` |
@@ -187,6 +189,7 @@ Items with `startX / endX` are drawn as lines. Items with `width / height` are d
 | Method | Description |
 | --- | --- |
 | `getAnnotationJson()` | Current annotation JSON |
+| `loadAnnotationJson(payload)` | Draw JSON onto the current image. Returns `false` when the image is not ready |
 | `getAnnotationPayload()` | Same as `getAnnotationJson()` |
 | `getAnnotatedImageFile(filename?, options?)` | Composited image as a `File` |
 | `getAnnotatedImageBlob(options?)` | Composited image as a `Blob` |

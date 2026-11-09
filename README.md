@@ -41,7 +41,7 @@ app.mount('#app')
   <annotation-canvas
     ref="canvas"
     :image-url="imageUrl"
-    storage-key="page-1"
+    canvas-id="page-1"
     @save="onSave"
   />
 </template>
@@ -80,7 +80,7 @@ export default {
 <annotation-canvas
   ref="canvas"
   :image-url="imageUrl"
-  storage-key="page-1"
+  canvas-id="page-1"
   save-mode="json"
   :colors="['#ef4444', '#3b82f6']"
   :line-widths="[{ value: 2, label: '细' }, { value: 5, label: '粗' }]"
@@ -116,19 +116,21 @@ const result = await this.$refs.canvas.exportResult()
 ```vue
 <annotation-canvas
   :image-url="imageUrl"
-  storage-key="page-1"
+  canvas-id="page-1"
   :initial-stored-payload="savedJson"
 />
 ```
 
 `savedJson` 与 `getAnnotationJson()` 的返回值一致，形如 `{ objects: [ /* fabric 对象 */ ] }`。
 
+图片已经打开时，调用 `loadAnnotationJson(savedJson)` 把标注画到当前图片上。参数也可以是 `objects` 数组，或 JSON 字符串。
+
 ## Props
 
 | 属性 | 类型 | 默认值 | 说明 |
 | --- | --- | --- | --- |
 | imageUrl | String | 必填 | 图片地址 |
-| storageKey | String | 必填 | 画布标识，同一页面多个实例时需互不相同 |
+| canvasId | String | 必填 | 画布标识。同一页多个实例需互不相同，并写入默认导出文件名，如 `annotation-page-1.png` |
 | saveMode | String | `'json'` | `json`：保存标注数据；`image`：原图叠加标注后导出新图 |
 | imageType | String | `'png'` | 导出图片格式，`png` 或 `jpeg` |
 | imageQuality | Number | `0.92` | `jpeg` 质量，范围 `0 ~ 1` |
@@ -211,6 +213,7 @@ placeholderUrl: 'iVBORw0KGgo...'
 | 方法 | 说明 |
 | --- | --- |
 | `getAnnotationJson()` | 当前标注 JSON |
+| `loadAnnotationJson(payload)` | 把 JSON 画到当前图片上。图片未就绪时返回 `false` |
 | `getAnnotationPayload()` | 同 `getAnnotationJson()` |
 | `getAnnotatedImageFile(filename?, options?)` | 叠加标注后的 `File` |
 | `getAnnotatedImageBlob(options?)` | 叠加标注后的 `Blob` |

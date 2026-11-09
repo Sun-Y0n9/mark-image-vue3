@@ -33,7 +33,7 @@ function mount (props) {
     render () {
       return h(AnnotationCanvas, {
         imageUrl: demoImage,
-        storageKey: 'config-check',
+        canvasId: 'config-check',
         ...props,
         onSave: (payload) => events.save.push(payload),
         onClear: () => events.clear.push(true),
@@ -293,6 +293,82 @@ await test('initialAnnotateList 能回显线和矩形', async () => {
   })
 })
 
+await test('loadAnnotationJson 能在图片打开后替换标注', async () => {
+  const line = {
+    type: 'line',
+    x1: 8,
+    y1: 8,
+    x2: 40,
+    y2: 40,
+    stroke: '#1890ff',
+    strokeWidth: 2
+  }
+  const rect = {
+    type: 'rect',
+    left: 20,
+    top: 20,
+    width: 30,
+    height: 16,
+    fill: 'transparent',
+    stroke: '#f5222d',
+    strokeWidth: 2
+  }
+  const ellipse = {
+    type: 'ellipse',
+    left: 50,
+    top: 40,
+    rx: 18,
+    ry: 10,
+    fill: 'transparent',
+    stroke: '#52c41a',
+    strokeWidth: 2
+  }
+
+  await withCanvas({
+    initialAnnotateList: [
+      { coordinate: { x: 12, y: 16, width: 40, height: 24 }, style: { stroke: '#f5222d', strokeWidth: 2 } }
+    ]
+  }, async (ctx) => {
+    await untilLoaded(ctx)
+    assert(ctx.exposed.getAnnotationJson().objects.length === 1, '加载前应有初始矩形')
+
+    const loaded = async (expected) => {
+      const before = ctx.events.loaded.length
+      await waitFor(() => {
+        if (ctx.events.loaded.length <= before) return false
+        const types = ctx.exposed.getAnnotationJson().objects.map(item => item.type).join(',')
+        return types === expected
+      })
+    }
+
+    assert(ctx.exposed.loadAnnotationJson({ objects: [line, ellipse] }) === true, '对象结果应加载成功')
+    await loaded('line,ellipse')
+    const replaced = ctx.exposed.getAnnotationJson()
+    assert(replaced.objects.every(item => item.selectable === false), '加载后的标注不可选中')
+    assert(ctx.exposed.hasUnsavedChanges() === false, '加载完成不应算未保存')
+
+    assert(ctx.exposed.loadAnnotationJson(JSON.stringify({ objects: [rect] })) === true, 'JSON 字符串应加载成功')
+    await loaded('rect')
+
+    assert(ctx.exposed.loadAnnotationJson([ellipse]) === true, '对象数组应加载成功')
+    await loaded('ellipse')
+
+    const beforeInvalid = ctx.exposed.getAnnotationJson().objects.map(item => item.type).join(',')
+    assert(ctx.exposed.loadAnnotationJson('{bad') === false, '无法解析的字符串应返回 false')
+    assert(ctx.exposed.loadAnnotationJson({ marks: [] }) === false, '没有 objects 的对象应返回 false')
+    assert(ctx.exposed.getAnnotationJson().objects.map(item => item.type).join(',') === beforeInvalid, '失败时原标注应保留')
+
+    assert(ctx.exposed.loadAnnotationJson({ objects: [] }) === true, '空标注应加载成功')
+    assert(ctx.exposed.getAnnotationJson().objects.length === 0, '空标注应清掉当前图形')
+    assert(ctx.exposed.hasUnsavedChanges() === false, '清空后不应算未保存')
+  })
+
+  await withCanvas({ imageUrl: '' }, async (ctx) => {
+    await nextTick()
+    assert(ctx.exposed.loadAnnotationJson({ objects: [rect] }) === false, '图片未就绪时应返回 false')
+  })
+})
+
 await test('撤销、未保存状态、清除确认与保存 JSON', async () => {
   const messages = []
   await withCanvas({
@@ -344,7 +420,7 @@ await test('撤销、未保存状态、清除确认与保存 JSON', async () => 
 
 await test('saveMode=image 按 imageType 导出文件名和数据', async () => {
   await withCanvas({
-    storageKey: 'page-9',
+    canvasId: 'page-9',
     saveMode: 'image',
     imageType: 'jpeg',
     imageQuality: 0.4,
