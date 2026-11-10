@@ -8,6 +8,8 @@ Dependencies: `vue@3`, `fabric@4`.
 
 Live demo: https://sun-y0n9.github.io/mark-image-vue3/
 
+`@mark-image/vue` live demo: https://sun-y0n9.github.io/mark-image-vue/
+
 ## Features
 
 - Pen, rectangle, and circle (each can be enabled as needed)
