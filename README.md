@@ -8,6 +8,8 @@ Vue 3 图片标注组件，行为与 Vue 2 版 `@mark-image/vue` 对应。在图
 
 在线体验：https://sun-y0n9.github.io/mark-image-vue3/
 
+`@mark-image/vue` 在线体验：https://sun-y0n9.github.io/mark-image-vue/
+
 ## 功能
 
 - 铅笔、方框、圆圈（可按需启用）
