@@ -1,7 +1,14 @@
 <template>
   <div class="demo">
     <header class="demo-header">
-      <h1>@mark-image/vue3</h1>
+      <div class="demo-title">
+        <h1>@mark-image/vue3 在线演示</h1>
+        <nav class="demo-links">
+          <a href="https://github.com/Sun-Y0n9/mark-image-vue3" target="_blank" rel="noopener noreferrer">mark-image/vue3仓库</a>
+          <a href="https://github.com/Sun-Y0n9/mark-image-vue" target="_blank" rel="noopener noreferrer">mark-image/vue仓库</a>
+          <a href="https://sun-y0n9.github.io/mark-image-vue/" target="_blank" rel="noopener noreferrer">mark-image/vue在线演示</a>
+        </nav>
+      </div>
       <div class="demo-config">
         <label>保存
           <select v-model="saveMode">
@@ -220,9 +227,35 @@ body,
   padding: 12px 20px 8px;
 }
 
+.demo-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
 .demo-header h1 {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 18px;
+}
+
+.demo-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.demo-links a {
+  color: #8eb4ff;
+  font-size: 13px;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.demo-links a:hover {
+  text-decoration: underline;
 }
 
 .demo-config {
